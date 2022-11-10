@@ -17,11 +17,9 @@ Hooks.on("init", () => {
     config: false,
     default: {
       source: "data",
-      bucket: "",
-      region: "",
-      path: "worlds/" + game.world.id,
+      path: "uploaded_scenes/",
       offset: 0.0,
-      fidelity: 3,
+      fidelity: 4,
       multiImageMode: "g",
       webpConversion: true,
       wallsAroundFiles: true,
@@ -65,13 +63,10 @@ class DDImporter extends FormApplication {
     let settings = game.settings.get("dd-import", "importSettings")
 
     data.dataSources = {
-      data: "User Data",
-      s3: "S3"
+      data: "User Data"
     }
     data.defaultSource = settings.source || "data";
 
-    data.s3Bucket = settings.bucket || "";
-    data.s3Region = settings.region || "";
     data.path = settings.path || "";
     data.offset = settings.offset || 0;
     data.padding = settings.padding || 0.25
@@ -98,8 +93,6 @@ class DDImporter extends FormApplication {
       let offset = parseFloat(formData["offset"])
       let padding = parseFloat(formData["padding"])
       let source = formData["source"]
-      let bucket = formData["bucket"]
-      let region = formData["region"]
       let path = formData["path"]
       let filecount = formData["filecount"]
       let mode = formData["multi-mode"]
@@ -110,9 +103,6 @@ class DDImporter extends FormApplication {
       let useCustomPixelsPerGrid = formData["use-custom-gridPPI"]
       let customPixelsPerGrid = formData["customGridPPI"] * 1
       var firstFileName
-
-      if ((!bucket || !region) && source == "s3")
-        return ui.notifications.error("Bucket and Region required for S3 upload")
 
       let files = []
       var fileName = 'combined'
@@ -305,12 +295,10 @@ class DDImporter extends FormApplication {
       ui.notifications.notify("upload still in progress, please wait")
       await p
       ui.notifications.notify("creating scene")
-      DDImporter.DDImport(aggregated, sceneName, fileName, path, fidelity, offset, padding, image_type, bucket, region, source, pixelsPerGrid)
+      DDImporter.DDImport(aggregated, sceneName, fileName, path, fidelity, offset, padding, image_type, source, pixelsPerGrid)
 
       game.settings.set("dd-import", "importSettings", {
         source: source,
-        bucket: bucket,
-        region: region,
         path: path,
         offset: offset,
         padding: padding,
@@ -345,7 +333,6 @@ class DDImporter extends FormApplication {
       let counter = html.find('[name="filecount"]')[0]
       newfile.setAttribute("class", "file-input")
       newfile.setAttribute("type", "file")
-      newfile.setAttribute("accept", ".dd2vtt,.df2vtt,.uvtt")
       newfile.setAttribute("name", "file" + counter.value)
       counter.value = parseInt(counter.value) + 1
       let files = html.find("#dd-upload-files")[0]
@@ -467,15 +454,10 @@ class DDImporter extends FormApplication {
     await FilePicker.upload(source, path, uploadFile, { bucket: bucket })
   }
 
-  static async DDImport(file, sceneName, fileName, path, fidelity, offset, padding, extension, bucket, region, source, pixelsPerGrid) {
+  static async DDImport(file, sceneName, fileName, path, fidelity, offset, padding, extension, source, pixelsPerGrid) {
     if (path && path[path.length - 1] != "/")
       path = path + "/"
     let imagePath = path + fileName + "." + extension;
-    if (source === "s3") {
-      if (imagePath[0] != "/")
-        imagePath = "/" + imagePath
-      imagePath = "https://" + bucket + ".s3." + region + ".amazonaws.com" + imagePath;
-    }
     let newScene = new Scene({
       name: sceneName,
       grid: pixelsPerGrid,

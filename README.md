@@ -1,9 +1,9 @@
 # FVTT-DD-Importer
 Allows importing Universal VTT map files into FoundryVTT.
 
-**Version 2.4.0**
+**Version 2.5.0**
 
-Manifest: `https://raw.githubusercontent.com/moo-man/FVTT-DD-Import/master/module.json`
+Manifest: `https://raw.githubusercontent.com/kalak/FVTT-DD-Import/master/module.json`
 
 
 ## Usage Instructions
@@ -14,4 +14,4 @@ Manifest: `https://raw.githubusercontent.com/moo-man/FVTT-DD-Import/master/modul
   a. **Fidelity**: How many cave walls are used. Far left - less walls, better performance, Far right - more walls, worse performance  
   b. **Offset**: How much to nudge the walls away from the edge.
 
-  If you don't use S3, make sure the storage type is set to User Data and ignore the S3 fields.
+  
